@@ -4,6 +4,7 @@ import librosa
 import python_speech_features as psf
 import numpy as np
 import json
+from scipy import interpolate
 
 
 class LipSyncPredictor(object):
@@ -33,11 +34,14 @@ class LipSyncPredictor(object):
         viseme_result, bs_weights = self._make_viseme_and_bs_weights(
             prediction=prediction, num_frames=num_frames
         )
+
+        subsampled_bs_weights = self._change_fps(
+            bs_weights=bs_weights, from_fps=100, to_fps=60
+        )
         
         return {
             "num_frames": num_frames,
-            "viseme": viseme_result,
-            "blendshapes": bs_weights
+            "blendshapes": subsampled_bs_weights
         }
 
     def predict_outputs_from_audio_chunk(self, audio_chunk: np.array):
@@ -57,11 +61,14 @@ class LipSyncPredictor(object):
         viseme_result, bs_weights = self._make_viseme_and_bs_weights(
             prediction=prediction, num_frames=num_frames
         )
+
+        subsampled_bs_weights = self._change_fps(
+            bs_weights=bs_weights, from_fps=100, to_fps=60
+        )
         
         return {
             "num_frames": num_frames,
-            "viseme": viseme_result,
-            "blendshapes": bs_weights
+            "blendshapes": subsampled_bs_weights
         }
 
     def _make_viseme_and_bs_weights(self, prediction, num_frames):
@@ -77,6 +84,18 @@ class LipSyncPredictor(object):
             bs_weights[i, ] = bs_w
         
         return viseme_result, bs_weights
+    
+    def _change_fps(self, bs_weights, from_fps=100, to_fps=60):
+        num_frames = bs_weights.shape[0]
+        frametime = 1000 / from_fps
+        original_times = np.linspace(0, num_frames -1, num_frames)
+        sample_times = np.linspace(0, num_frames-1, int(1.0 * (num_frames * (to_fps * frametime))))
+
+        subsampled_bs_weights = interpolate.griddata(
+            original_times, bs_weights.reshape([num_frames, -1]), sample_times, method='linear'
+        )
+
+        return subsampled_bs_weights
 
 
 if __name__ == "__main__":
