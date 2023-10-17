@@ -1,3 +1,4 @@
+import os
 import tensorflow as tf
 import librosa
 import python_speech_features as psf
@@ -6,11 +7,11 @@ import json
 
 
 class LipSyncPredictor(object):
-    def __init__(self, model_path="./assets/lipsync/phoneme_clf_gglabs.h5"):
+    def __init__(self, model_path="./assets/lipsync/phoneme_clf_gglabs.h5", prefix=""):
         self.model = tf.keras.models.load_model(model_path)
-        self.arkit_bs_mapper = json.load(open('assets/lipsync/arkit_bs_weights_mapper.json'))
-        self.timit_index_mapper = json.load(open('assets/lipsync/timit_index_map.json'))
-        self.viseme_char_mapper = json.load(open('assets/lipsync/viseme_char_map.json'))
+        self.arkit_bs_mapper = json.load(open(os.path.join(prefix, 'assets/lipsync/arkit_bs_weights_mapper.json')))
+        self.timit_index_mapper = json.load(open(os.path.join(prefix, 'assets/lipsync/timit_index_map.json')))
+        self.viseme_char_mapper = json.load(open(os.path.join(prefix, 'assets/lipsync/viseme_char_map.json')))
         self.sample_rate = 16000
         self.num_blendshapes = 52
         self.single_chunk_size = 400
