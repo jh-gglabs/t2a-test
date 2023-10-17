@@ -91,7 +91,7 @@ class LipSyncPredictor(object):
     
     def _change_fps(self, bs_weights, from_fps=100, to_fps=60):
         num_frames = bs_weights.shape[0]
-        frametime = 1000 / from_fps
+        frametime = from_fps / 10000
         original_times = np.linspace(0, num_frames -1, num_frames)
         sample_times = np.linspace(0, num_frames-1, int(1.0 * (num_frames * (to_fps * frametime))))
 
