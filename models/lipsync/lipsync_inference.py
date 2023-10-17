@@ -38,6 +38,8 @@ class LipSyncPredictor(object):
         subsampled_bs_weights = self._change_fps(
             bs_weights=bs_weights, from_fps=100, to_fps=60
         )
+
+        num_frames = subsampled_bs_weights.shape[0]
         
         return {
             "num_frames": num_frames,
@@ -65,6 +67,8 @@ class LipSyncPredictor(object):
         subsampled_bs_weights = self._change_fps(
             bs_weights=bs_weights, from_fps=100, to_fps=60
         )
+
+        num_frames = subsampled_bs_weights.shape[0]
         
         return {
             "num_frames": num_frames,
